@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+ML_project/
 .Python
 build/
 develop-eggs/

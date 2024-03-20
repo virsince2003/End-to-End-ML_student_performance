@@ -5,7 +5,8 @@ from src.logger import logging
 from src.exception import custom_exception
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
-
+from src.components.data_transform import DataTransformationConfig
+from src.components.data_transform import DataTransformation
 """
 Gathering data from the source
 
@@ -15,7 +16,7 @@ Gathering data from the source
 class DataIngestionConfig:
     train_data_path: str = os.path.join("artifacts","train.csv")
     test_data_path: str = os.path.join("artifacts","test.csv")
-    total_data_path : str = os.path.join("data","student_data.csv")
+    data_path : str = os.path.join("data","student_data.csv")
     
 
 class DataIngestion:
@@ -29,7 +30,7 @@ class DataIngestion:
             """
             readin the student data csv file and spliting it to train and split
             """
-            df = pd.read_csv(self.data_ingestion.total_data_path)
+            df = pd.read_csv(self.data_ingestion.data_path)
             logging.info("reading csv sucessfully")
             
             train_data,test_data = train_test_split(df, test_size=0.3, random_state=42)
@@ -53,4 +54,8 @@ class DataIngestion:
             raise custom_exception(e,sys)
 
 if __name__ == "__main__":
-    train_data,test_data = DataIngestion().initiate_data_ingestion()
+    ingestion = DataIngestion()
+    train_data,test_data = ingestion.initiate_data_ingestion()
+    
+    transformation = DataTransformation()
+    train_arr, test_arr, _ = transformation.initiate_data_ingestion(train_data,test_data)
