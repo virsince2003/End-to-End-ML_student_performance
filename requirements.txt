@@ -2,4 +2,5 @@ setuptools
 pandas
 numpy
 scikit-learn
+catboost
 -e .
