@@ -1,12 +1,14 @@
 import os
 import sys
 import pandas as pd
+sys.path.append("E:\End-to-End_ML_Projects\End-to-End-ML_student_performance")
 from src.logger import logging
 from src.exception import custom_exception
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
 from src.components.data_transform import DataTransformationConfig
 from src.components.data_transform import DataTransformation
+
 """
 Gathering data from the source
 
