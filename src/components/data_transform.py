@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd 
 from src.logger import logging
-from src.utils import model_save
+from src.utils import object_save
 from dataclasses import dataclass
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -102,7 +102,7 @@ class DataTransformation:
             logging.info("Sucessfull fit transform train data and transfom test data")
             
             # Saving the object
-            model_save(preprocessor_object,self.data_transformation.preprocessor_path)
+            object_save(preprocessor_object,self.data_transformation.preprocessor_path)
             
             logging.info(f"Saved preprocessing object.")
             
