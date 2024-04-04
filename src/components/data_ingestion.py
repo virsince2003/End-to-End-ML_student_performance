@@ -1,13 +1,13 @@
 import os
 import sys
 import pandas as pd
-sys.path.append("E:\End-to-End_ML_Projects\End-to-End-ML_student_performance")
+# sys.path.append("E:\End-to-End_ML_Projects\End-to-End-ML_student_performance")
 from src.logger import logging
-from src.exception import custom_exception
 from dataclasses import dataclass
+from src.exception import custom_exception
+# from src.components.model_trainer import ModelTrain
 from sklearn.model_selection import train_test_split
-from src.components.data_transform import DataTransformationConfig
-from src.components.data_transform import DataTransformation
+# from src.components.data_transform import DataTransform, DataTransformationConfig
 
 """
 Gathering data from the source
@@ -39,13 +39,13 @@ class DataIngestion:
             logging.info("splitting sucessfull train and test")
             
             # train file
-            os.mkdir(os.path.dirname(self.data_ingestion.train_data_path), exist_ok=True)
+            os.makedirs(os.path.dirname(self.data_ingestion.train_data_path), exist_ok=True)
             
          # pushing  train and test data to csv
             train_data.to_csv(self.data_ingestion.train_data_path,index=False, header=True)
             
             # test file making
-            os.mkdir(os.path.dirname(self.data_ingestion.test_data_path), exist_ok=True)
+            os.makedirs(os.path.dirname(self.data_ingestion.test_data_path), exist_ok=True)
             test_data.to_csv(self.data_ingestion.test_data_path,index=False, header=True)
             
             logging.info("Data Ingestion completed")
@@ -54,10 +54,3 @@ class DataIngestion:
         
         except Exception as e:
             raise custom_exception(e,sys)
-
-if __name__ == "__main__":
-    ingestion = DataIngestion()
-    train_data,test_data = ingestion.initiate_data_ingestion()
-    
-    transformation = DataTransformation()
-    train_arr, test_arr, _ = transformation.initiate_data_ingestion(train_data,test_data)

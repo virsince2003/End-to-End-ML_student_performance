@@ -11,7 +11,6 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.linear_model import LinearRegression
 from src.utils import model_evaluation, object_save
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor 
-from sklearn.ensemble import VotingRegressor,BaggingRegressor,StackingRegressor 
 
 
 @dataclass
@@ -40,14 +39,12 @@ class ModelTrain:
                 "decision_tree": DecisionTreeRegressor(),
                 "random_forest": RandomForestRegressor(),
                 "knn": KNeighborsRegressor(),
-                "ada_boost": AdaBoostRegressor(),
                 "cat_boost": CatBoostRegressor(logging_level='Silent'),
                 "xgboost": XGBRegressor()
             }
             
             parameters = {
                 "linear_regression": {},
-                
                 "decision_tree": {
                     "criterion" : ["squared_error", "friedman_mse", "absolute_error", "poisson"],
                     "splitter" : ['best','random'],
@@ -66,12 +63,6 @@ class ModelTrain:
                     "algorithm" : ['auto','ball_tree', 'kd_tree', 'brute'],
                     },
                 
-                "ada_boost": {
-                    'learning_rate': [.1,.01,0.5,.001],
-                    'loss': ['linear','square','exponential'],
-                    'n_estimators': [80,100, 150, 200, 250]
-                    },
-                
                 "cat_boost": {
                     'learning_rate': [0.01, 0.05, 0.1],
                     'iterations': [30, 50, 100]
@@ -86,9 +77,9 @@ class ModelTrain:
             logging.info("Training models")
             
             model_report:dict = model_evaluation(x_train = x_train, x_test = x_test, y_train = y_train, y_test = y_test , models = models, parameters = parameters)
-            
+            logging.warning(f"Model report: {model_report}")
             best_model_score = max(sorted(model_report.values()))
-            best_model_name = list(model_report.key())[list(model_report.values()).index(best_model_score)]
+            best_model_name = list(model_report.keys())[list(model_report.values()).index(best_model_score)]
             
             best_model = models[best_model_name]
             
@@ -99,7 +90,6 @@ class ModelTrain:
             
             object_save(object=best_model, file_path=self.model_train_config.final_model_path)
             logging.info(f"Model saved at {self.model_train_config.final_model_path}")
-            
             prediction = best_model.predict(x_test)
             r2 = r2_score(y_test, prediction)
             

@@ -24,8 +24,9 @@ def model_evaluation(x_train, x_test, y_train, y_test, models, parameters):
                 
         for i in range(len(list(models))):
             model = list(models.values())[i]
+            print(model)
             parameter =  parameters[list(models.keys())[i]]
-            grid_search = GridSearchCV(model, parameter, cv=4)
+            grid_search = GridSearchCV(model, parameter, cv=5)
             grid_search.fit(x_train, y_train)
             
             model.set_params(**grid_search.best_params_)
@@ -37,8 +38,10 @@ def model_evaluation(x_train, x_test, y_train, y_test, models, parameters):
             train_model_score = r2_score(y_train, y_train_pred)
             test_model_score = r2_score(y_test, y_test_pred)
             
+            print(f"Train score: {train_model_score}")
+            print(f"Test score: {test_model_score}")
             detailed_report[list(models.keys())[i]] = test_model_score
-            return detailed_report            
+        return detailed_report       
             
     except Exception as e:
         raise custom_exception(e,sys)

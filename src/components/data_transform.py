@@ -1,5 +1,6 @@
 import os
 import sys
+import numpy as np
 import pandas as pd 
 from src.logger import logging
 from src.utils import object_save
@@ -8,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from src.exception import custom_exception
 from sklearn.compose import ColumnTransformer
-from src.components.data_ingestion import DataIngestion
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 @dataclass
@@ -17,7 +18,7 @@ class DataTransformationConfig:
 
 
 
-class DataTransformation:
+class DataTransform:
     def __init__(self):
         self.data_transformation = DataTransformationConfig()
         
@@ -43,12 +44,13 @@ class DataTransformation:
             
             catagorical_pipeline = Pipeline(
                 steps=[
-                    ("imputer", SimpleImputer(strategy="most-frequent")),
-                    ("one_hot_encoder", OneHotEncoder()),
+                    ("imputer", SimpleImputer(strategy="most_frequent")),
+                    ("one_hot_encoder", OneHotEncoder(handle_unknown="ignore")),
                     ("scaler", StandardScaler(with_mean=False)) 
                     
                 ]
             )
+        
             logging.warning("with_mean = FALSE for sparce metrics memory limitation error")
             
             logging.info("created numarical_column: ".format(numarical_features) )
@@ -59,9 +61,9 @@ class DataTransformation:
                 transformers=[
                     ("num", numarical_pipeline,numarical_features),
                     ("cat",catagorical_pipeline,catagorical_features)
-                ]
+                ],
+                remainder='drop'
             )
-        
             return preprocessor
         
         except Exception as e:
@@ -85,21 +87,28 @@ class DataTransformation:
             # spliting targert feature and input features from train and test dataframe
             target_feature_name = "math_score"
             
-            # train dataframe
-            input_features_train_df = train_df.drop(columns=[target_feature_name],axis=1)
-            target_feature_train_df = train_df[target_feature_name]
-            logging.info("Sucessfull split target_feature from train dataframe ")
+            # Explicit data splitting
+            X_train, X_test, y_train, y_test = train_test_split(
+                train_df.drop(columns=[target_feature_name], axis=1),
+                train_df[target_feature_name],
+                test_size=0.3,
+                random_state=42,
+            )
             
-            #test dataframe
-            input_features_test_df = train_df.drop(columns=[target_feature_name],axis=1)
-            target_feature_test_df = train_df[target_feature_name]
+            # Preprocessing
+            preprocessor_object = self.get_data_to_transform()
             logging.info("Sucessfull split target_feature from test dataframe ")
-
             
-            train_arr = preprocessor_object.fit_transform(input_features_train_df,target_feature_train_df)
-            test_arr = preprocessor_object.transform(input_features_test_df,target_feature_test_df)
+            train_arr = preprocessor_object.fit_transform(X_train, y_train)
+            
+            print(f"train_arr: {train_arr.shape}")
+            test_arr = preprocessor_object.transform(X_test)
+            print(f"test_arr: {test_arr.shape}")
+            
+            
             
             logging.info("Sucessfull fit transform train data and transfom test data")
+            
             
             # Saving the object
             object_save(preprocessor_object,self.data_transformation.preprocessor_path)
